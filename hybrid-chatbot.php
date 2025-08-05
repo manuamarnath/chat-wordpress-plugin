@@ -211,7 +211,14 @@ function hybrid_chat_sync_faq_to_backend($faq_content) {
         ],
         'body' => json_encode($body)
     ];
-    wp_remote_post($api_url, $args);
+    $response = wp_remote_post($api_url, $args);
+    // Debug output for FAQ sync
+    if (is_wp_error($response)) {
+        error_log('Hybrid Chat FAQ sync error: ' . $response->get_error_message());
+    } else {
+        error_log('Hybrid Chat FAQ sync payload: ' . json_encode($body));
+        error_log('Hybrid Chat FAQ sync response: ' . wp_remote_retrieve_body($response));
+    }
 }
 
 // Helper: Sync bot settings to backend
