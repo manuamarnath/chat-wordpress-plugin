@@ -195,8 +195,11 @@ add_action('admin_init', function() {
                 echo '<div class="error"><p>' . esc_html($content) . '</p></div>';
             }
         }
-        // Sync FAQ on manual save
-        if (isset($_POST['option_page']) && $_POST['option_page'] === 'hybrid_chat_ai_training' && isset($_POST['hybrid_chat_faq'])) {
+        // Always sync FAQ to backend when the AI Training tab is saved
+        if (
+            ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hybrid_chat_faq'])) ||
+            (isset($_POST['option_page']) && $_POST['option_page'] === 'hybrid_chat_ai_training' && isset($_POST['hybrid_chat_faq']))
+        ) {
             hybrid_chat_sync_faq_to_backend($_POST['hybrid_chat_faq']);
         }
         echo '<textarea name="hybrid_chat_faq" rows="10" style="width:100%">' . esc_textarea(get_option('hybrid_chat_faq')) . '</textarea>';
