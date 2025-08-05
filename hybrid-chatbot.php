@@ -136,6 +136,24 @@ add_action('admin_init', function() {
     register_setting('hybrid_chat_ai_training', 'hybrid_chat_faq');
     add_settings_section('hybrid_chat_ai_training_section', '', null, 'hybrid_chat_ai_training');
     add_settings_field('hybrid_chat_faq', 'FAQ Questions & Answers', function() {
+        // Fetch FAQ from backend before displaying
+        $site_id = get_option('hybrid_chat_site_id');
+        $jwt = get_option('hybrid_chat_jwt');
+        if ($site_id && $jwt && !isset($_POST['option_page'])) {
+            $faq_url = 'https://hybrid-chat-be.onrender.com/faq?siteId=' . urlencode($site_id);
+            $faq_response = wp_remote_get($faq_url, [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . $jwt
+                ]
+            ]);
+            if (!is_wp_error($faq_response)) {
+                $faq_data = json_decode(wp_remote_retrieve_body($faq_response), true);
+                if (!empty($faq_data['faqContent'])) {
+                    update_option('hybrid_chat_faq', $faq_data['faqContent']);
+                }
+            }
+        }
         // Handle file upload if present
         if (isset($_FILES['faq_file']) && $_FILES['faq_file']['error'] === UPLOAD_ERR_OK) {
             $file_tmp = $_FILES['faq_file']['tmp_name'];
