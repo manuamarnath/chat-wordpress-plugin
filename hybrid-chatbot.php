@@ -63,6 +63,13 @@ function hybrid_chat_settings_page() {
     ?>
     <div class="wrap">
         <h1>Hybrid Chat Settings</h1>
+        <?php
+        // Show persistent FAQ sync message if set
+        if ($msg = get_transient('hybrid_chat_faq_sync_msg')) {
+            echo $msg;
+            delete_transient('hybrid_chat_faq_sync_msg');
+        }
+        ?>
         <?php if (!$site_id || !$jwt): ?>
             <form method="post">
                 <h2>Client Login</h2>
@@ -201,17 +208,22 @@ add_action('admin_init', function() {
             (isset($_POST['option_page']) && $_POST['option_page'] === 'hybrid_chat_ai_training' && isset($_POST['hybrid_chat_faq']))
         ) {
             $sync_response = hybrid_chat_sync_faq_to_backend($_POST['hybrid_chat_faq']);
+            $msg = '';
             if (is_wp_error($sync_response)) {
-                echo '<div class="error"><p>FAQ sync failed: ' . esc_html($sync_response->get_error_message()) . '</p></div>';
+                $msg = '<div class="error"><p>FAQ sync failed: ' . esc_html($sync_response->get_error_message()) . '</p></div>';
             } elseif ($sync_response) {
                 $body = wp_remote_retrieve_body($sync_response);
                 $result = json_decode($body, true);
                 if (!empty($result['success'])) {
-                    echo '<div class="updated"><p>FAQ synced to backend successfully.</p></div>';
+                    $msg = '<div class="updated"><p>FAQ synced to backend successfully.</p></div>';
                 } else {
-                    echo '<div class="error"><p>FAQ sync error: ' . esc_html($body) . '</p></div>';
+                    $msg = '<div class="error"><p>FAQ sync error: ' . esc_html($body) . '</p></div>';
                 }
             }
+            set_transient('hybrid_chat_faq_sync_msg', $msg, 30);
+            // Redirect to avoid resubmission and show message
+            wp_redirect(admin_url('admin.php?page=hybrid-chat&tab=ai_training'));
+            exit;
         }
         echo '<textarea name="hybrid_chat_faq" rows="10" style="width:100%">' . esc_textarea(get_option('hybrid_chat_faq')) . '</textarea>';
         echo '<p class="description">Enter FAQ as Q: ... A: ... blocks, one per line or paragraph.</p>';
