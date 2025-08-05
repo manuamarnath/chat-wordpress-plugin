@@ -200,7 +200,18 @@ add_action('admin_init', function() {
             ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hybrid_chat_faq'])) ||
             (isset($_POST['option_page']) && $_POST['option_page'] === 'hybrid_chat_ai_training' && isset($_POST['hybrid_chat_faq']))
         ) {
-            hybrid_chat_sync_faq_to_backend($_POST['hybrid_chat_faq']);
+            $sync_response = hybrid_chat_sync_faq_to_backend($_POST['hybrid_chat_faq']);
+            if (is_wp_error($sync_response)) {
+                echo '<div class="error"><p>FAQ sync failed: ' . esc_html($sync_response->get_error_message()) . '</p></div>';
+            } elseif ($sync_response) {
+                $body = wp_remote_retrieve_body($sync_response);
+                $result = json_decode($body, true);
+                if (!empty($result['success'])) {
+                    echo '<div class="updated"><p>FAQ synced to backend successfully.</p></div>';
+                } else {
+                    echo '<div class="error"><p>FAQ sync error: ' . esc_html($body) . '</p></div>';
+                }
+            }
         }
         echo '<textarea name="hybrid_chat_faq" rows="10" style="width:100%">' . esc_textarea(get_option('hybrid_chat_faq')) . '</textarea>';
         echo '<p class="description">Enter FAQ as Q: ... A: ... blocks, one per line or paragraph.</p>';
@@ -236,9 +247,11 @@ function hybrid_chat_sync_faq_to_backend($faq_content) {
     // Debug output for FAQ sync
     if (is_wp_error($response)) {
         error_log('Hybrid Chat FAQ sync error: ' . $response->get_error_message());
+        return $response;
     } else {
         error_log('Hybrid Chat FAQ sync payload: ' . json_encode($body));
         error_log('Hybrid Chat FAQ sync response: ' . wp_remote_retrieve_body($response));
+        return $response;
     }
 }
 
