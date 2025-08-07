@@ -132,7 +132,7 @@ add_action('admin_init', function() {
     add_settings_section('hybrid_chat_appearance', '', null, 'hybrid_chat_appearance');
     add_settings_field('hybrid_chat_style', 'Chatbot Style', function() {
         $current_style = get_option('hybrid_chat_style', 'sleek');
-        $styles = ['sleek' => 'Sleek', 'glassmorphism' => 'Glassmorphism', 'minimal' => 'Minimal', 'corporate' => 'Corporate', 'playful' => 'Playful', 'liquid-glass' => 'Liquid Glass'];
+        $styles = ['sleek' => 'Sleek', 'glassmorphism' => 'Glassmorphism', 'minimal' => 'Minimal', 'corporate' => 'Corporate', 'playful' => 'Playful', 'liquid-glass' => 'Liquid Glass','dark-modern' => 'Dark Modern','sunset-glow' => 'Sunset Glow', 'oceanic' =>'Oceanic' ];
         echo '<select name="hybrid_chat_style">';
         foreach ($styles as $key => $label) {
             echo '<option value="' . esc_attr($key) . '"' . selected($current_style, $key, false) . '>' . esc_html($label) . '</option>';
