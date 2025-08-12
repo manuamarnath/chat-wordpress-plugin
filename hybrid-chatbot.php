@@ -27,7 +27,7 @@ function hybrid_chat_settings_page() {
     if (isset($_POST['hybrid_chat_login'])) {
         $email = sanitize_email($_POST['hybrid_chat_email']);
         $password = sanitize_text_field($_POST['hybrid_chat_password']);
-        $api_url = 'https://hybrid-chat-be.onrender.com/auth';
+        $api_url = 'https://echo-ai-chat-server.onrender.com/auth';
         $response = wp_remote_post($api_url, [
             'headers' => [ 'Content-Type' => 'application/json' ],
             'body' => json_encode([ 'userId' => $email, 'password' => $password ])
@@ -42,7 +42,7 @@ function hybrid_chat_settings_page() {
                 $site_id = $body['siteId'];
                 $jwt = $body['token'];
                 // Fetch and pre-fill bot settings after login
-                $config_url = 'https://hybrid-chat-be.onrender.com/config?siteId=' . urlencode($site_id);
+                $config_url = 'https://echo-ai-chat-server.onrender.com/config?siteId=' . urlencode($site_id);
                 $config_response = wp_remote_get($config_url, [
                     'headers' => [
                         'Content-Type' => 'application/json',
@@ -147,7 +147,7 @@ add_action('admin_init', function() {
         $site_id = get_option('hybrid_chat_site_id');
         $jwt = get_option('hybrid_chat_jwt');
         if ($site_id && $jwt && !isset($_POST['option_page'])) {
-            $faq_url = 'https://hybrid-chat-be.onrender.com/faq?siteId=' . urlencode($site_id);
+            $faq_url = 'https://echo-ai-chat-server.onrender.com/faq?siteId=' . urlencode($site_id);
             $faq_response = wp_remote_get($faq_url, [
                 'headers' => [
                     'Content-Type' => 'application/json',
@@ -242,7 +242,7 @@ function hybrid_chat_sync_faq_to_backend($faq_content) {
     $site_id = get_option('hybrid_chat_site_id');
     $jwt = get_option('hybrid_chat_jwt');
     if (!$site_id || !$jwt) return;
-    $api_url = 'https://hybrid-chat-be.onrender.com/faq'; // Changed to deployed backend URL
+    $api_url = 'https://echo-ai-chat-server.onrender.com/faq'; // Changed to deployed backend URL
     $body = [
         'siteId' => $site_id,
         'faqContent' => $faq_content,
@@ -272,7 +272,7 @@ function hybrid_chat_sync_settings_to_backend($old_value, $value) {
     $site_id = get_option('hybrid_chat_site_id');
     $jwt = get_option('hybrid_chat_jwt');
     if (!$site_id || !$jwt) return;
-    $api_url = 'https://hybrid-chat-be.onrender.com/config'; // Changed to deployed backend URL
+    $api_url = 'https://echo-ai-chat-server.onrender.com/config'; // Changed to deployed backend URL
     $body = [
         'siteId' => $site_id,
         'botName' => get_option('hybrid_chat_bot_name'),
@@ -297,7 +297,7 @@ add_action('wp_footer', function() {
     $site_id = esc_attr(get_option('hybrid_chat_site_id'));
     ?>
     <script
-        src="https://hybrid-chat-fe.vercel.app/widget.js"
+        src="https://hybot-frontend.vercel.app/widget.js"
         data-bot-name="<?php echo $bot_name; ?>"
         data-welcome="<?php echo $welcome; ?>"
         data-style="<?php echo $style; ?>"
