@@ -1,9 +1,14 @@
 <?php
 /*
 Plugin Name: Hybrid Chatbot
-Description: Injects the Hybrid Chatbot widget into your WordPress site and allows admin configuration.
+Description: A powerful, high-performance AI + human hybrid chatbot solution for WordPress. 
+Seamlessly integrates into your site with advanced customization options. 
+Includes smart lead collection, lead generation, and automated support features with optional 
+human handover. Built for speed, reliability, and scalability, Hybrid Chatbot ensures 
+next-level customer engagement and real-time conversations for maximum business growth.
 Version: 1.3
 Author: Echo5Digital
+Author URI: https://www.echo5digital.com/
 */
 
 // 1. Add top-level menu for Hybrid Chat settings
